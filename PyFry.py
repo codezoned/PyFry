@@ -1,9 +1,10 @@
 import cv2
 from PIL import Image
 import os
-import imutils
+from imutils import face_utils
+import dlib
 '''
-TODO: -> Compressing (Crushing) and back (to increase noise)
+TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
       -> Applying Red and Orange hue filters for classic deep fry look
       -> Detecting eye coordinates and applying the deepfry eye flare in the center
 '''
@@ -16,12 +17,26 @@ def crushAndBack(img):
     img = img.resize((w,h), resample = Image.BICUBIC)
     return img
 
-
-
 def main():
     img = Image.open('test.jpg')
     img = img.convert('RGB')
-    img = crushAndBack(img)
+    imgCV = cv2.imread('test.jpg')
+
+    # Initialising dlib for frontal facial features
+    detect = dlib.get_frontal_face_detector()
+    predict = dlib.shape_predictor("E:\Github projects\PyFry\assets\shape_predictor_68_face_landmarks.dat")
+
+    (lS, lE) = face_utils.FACIAL_LANDMARKS_68_IDXS["left_eye"]
+    (rS, rE) = face_utils.FACIAL_LANDMARKS_68_IDXS["right_eye"]
+
+    gray = cv2.cvtColor(imgCV, cv2.COLOR_BGR2GRAY)
+    subjects = detect(gray, 0)
+    for subject in subjects:
+        shape = predict(gray, subject)
+        shape = face_utils.shape_to_np(shape)
+        leftEye = shape[lS, lE]
+        rightEye = shape[rS, rE]
+        print(leftEye)
     img.show()
     #img.save('sample.jpg','jpeg')
 
