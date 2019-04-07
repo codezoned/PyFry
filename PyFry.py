@@ -10,6 +10,7 @@ TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
       -> Detecting eye coordinates and applying the deepfry eye flare in the center
 '''
 def irisCoords(eye):
+    #Finding the center point of th eye using the average outer extremes average of the eyes
     mid = (eye[0] +eye[3])/2
     mid = (int(mid[0]), int(mid[1]))
     return mid
@@ -70,22 +71,12 @@ def main():
     img = img.convert('RGB')
     img = crushAndBack(img)
     img = generateHue(img)
+
     #img.paste(flare,eyeLeft,flare)
-    '''
-    red = imgCV.split()[0] #(R,G,B)
-    red = ImageEnhance.Contrast(red).enhance(3.0)
-    red = ImageEnhance.Brightness(red).enhance(2.0)
-    red = ImageOps.colorize(red, Colors.RED, Colors.WHITE)
-    imgCV = Image.blend(imgCV, red, 0.6)
-    #Keeping a 100% sharpness value for now, But would probably be better with a higher sharpness value
-    imgCV = ImageEnhance.Sharpness(imgCV).enhance(100)
-    '''
+
     img.show()
     img.save('output.jpg')
-    '''
-    cv2.imshow("Frame", imgCV)
-    cv2.waitKey(0)
-    '''
+
     #img.save('sample.jpg','jpeg')
 
 if __name__ == '__main__':
