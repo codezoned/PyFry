@@ -6,8 +6,9 @@ from imutils import face_utils
 import dlib
 '''
 TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
-      -> Applying Red and Orange hue filters for classic deep fry look
-      -> Detecting eye coordinates and applying the deepfry eye flare in the center
+      -> Applying Red and Orange hue filters for classic deep fry look :: DONE
+      -> Detecting eye coordinates :: DONE
+      -> applying the deepfry eye flare in the center (irisCoords is returning those coordinates)
 '''
 def irisCoords(eye):
     #Finding the center point of th eye using the average outer extremes average of the eyes
