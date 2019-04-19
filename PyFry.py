@@ -57,8 +57,8 @@ def main():
         shape = face_utils.shape_to_np(shape)
         leftEye = shape[lS:lE]
         rightEye = shape[rS:rE]
-        print(leftEye)
-        print(irisCoords(leftEye))
+        #print(leftEye)
+        #print(irisCoords(leftEye))
         #leftEyeHull = cv2.convexHull(leftEye)
         #rightEyeHull = cv2.convexHull(rightEye)
         #cv2.drawContours(imgCV, [leftEyeHull], -1, (0, 255, 0), 1)
@@ -69,10 +69,24 @@ def main():
     #rightEyeArray.append(irisCoords(leftEye))
     eyeLeft = (leftEye[0],(leftEye[1] +leftEye[2])/2,leftEye[3],(leftEye[4]+leftEye[5])/2)
     eyeLeft = (leftEye[0], leftEye[1])
+    
     img = img.convert('RGB')
     img = crushAndBack(img)
     img = generateHue(img)
-
+    rec0=(leftEye[1][0]-100,leftEye[1][1]-100)
+    rec1=(leftEye[4][0]+100,leftEye[4][1]+100)
+    rec2=(rightEye[1][0]-100,rightEye[1][1]-100)
+    rec3=(rightEye[4][0]+100,rightEye[4][1]+100)
+    print("Area for left eye",rec0,rec1)
+    print("Area for right eye",rec2,rec3)
+    area=(rec0[0],rec0[1],rec1[0],rec1[1])
+    area1=(rec2[0],rec2[1],rec3[0],rec3[1])
+    flare1=flare.resize((rec1[0]-rec0[0],rec1[1]-rec0[1]))
+    flare2=flare.resize((rec3[0]-rec2[0],rec3[1]-rec2[1]))
+    img.paste(flare1,area,flare1)
+    img.paste(flare2,area1,flare2)
+      
+    
     #img.paste(flare,eyeLeft,flare)
 
     img.show()
