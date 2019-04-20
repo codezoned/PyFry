@@ -46,8 +46,8 @@ def main():
     (lS, lE) = face_utils.FACIAL_LANDMARKS_68_IDXS["left_eye"]
     (rS, rE) = face_utils.FACIAL_LANDMARKS_68_IDXS["right_eye"]
     
-    imgCV = cv2.imread('test.jpg')
-    img = Image.open('test.jpg')
+    imgCV = cv2.imread('meme1.jpg')
+    img = Image.open('meme1.jpg')
 
     gray = cv2.cvtColor(imgCV, cv2.COLOR_BGR2GRAY)
     subjects = detect(gray, 0)
