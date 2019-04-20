@@ -6,12 +6,12 @@ from imutils import face_utils
 import dlib
 '''
 TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
-      -> Applying Red and Orange hue filters for classic deep fry look :: DONE
-      -> Detecting eye coordinates :: DONE
-      -> applying the deepfry eye flare in the center (irisCoords is returning those coordinates)
+      -> Applying Red and Orange hue filters for classic deep fry look
+      -> Detecting eye coordinates and applying the deepfry eye flare in the center::DONE
+
 '''
 def irisCoords(eye):
-    #Finding the center point of th eye using the average outer extremes average of the eyes
+    #Finding the center point of the eye using the average outer extremes average of the eyes
     mid = (eye[0] +eye[3])/2
     mid = (int(mid[0]), int(mid[1]))
     return mid
@@ -36,9 +36,8 @@ def crushAndBack(img):
     img = img.resize((int(w ** .90), int(h ** .90)), resample = Image.BICUBIC)
     img = img.resize((w,h), resample = Image.BICUBIC)
     return img
-
-def main():
-    # Initialising dlib for frontal facial features
+def addFlare(img):
+    ''' Initialising dlib for frontal facial features '''
     flare = Image.open('flare.png')
     detect = dlib.get_frontal_face_detector()
     predict = dlib.shape_predictor("assets\shape_predictor_68_face_landmarks.dat")
@@ -47,7 +46,7 @@ def main():
     (rS, rE) = face_utils.FACIAL_LANDMARKS_68_IDXS["right_eye"]
     
     imgCV = cv2.imread('test.jpg')
-    img = Image.open('test.jpg')
+    #imgCV = cv2.imread('test2.jpg')
 
     gray = cv2.cvtColor(imgCV, cv2.COLOR_BGR2GRAY)
     subjects = detect(gray, 0)
@@ -57,42 +56,52 @@ def main():
         shape = face_utils.shape_to_np(shape)
         leftEye = shape[lS:lE]
         rightEye = shape[rS:rE]
-        #print(leftEye)
-        #print(irisCoords(leftEye))
-        #leftEyeHull = cv2.convexHull(leftEye)
-        #rightEyeHull = cv2.convexHull(rightEye)
-        #cv2.drawContours(imgCV, [leftEyeHull], -1, (0, 255, 0), 1)
-        #cv2.drawContours(imgCV, [rightEyeHull], -1, (0, 255, 0), 1)
-        #cv2.circle(imgCV, irisCoords(leftEye),5, (0.255,255), 1) 
-        #cv2.circle(imgCV, irisCoords(rightEye),5, (0.255,255), 1) 
-    #rightEyeArray = []
-    #rightEyeArray.append(irisCoords(leftEye))
-    eyeLeft = (leftEye[0],(leftEye[1] +leftEye[2])/2,leftEye[3],(leftEye[4]+leftEye[5])/2)
-    eyeLeft = (leftEye[0], leftEye[1])
+    '''
+        Assigning an area to paste the flare png Using the coordinates given by the Dlib module
+        ln,rn is the distance between the top left and bottom right of the iris multiplied by 4.
+        This is used to find the basic coordinates of the area in which the flare image will be pasted
+    '''
+
+    rn=(rightEye[4][0]-rightEye[0][0])*3
+    ln=(leftEye[4][0]-leftEye[0][0])*3
+
+    rec0=(leftEye[1][0]-ln,leftEye[1][1]-ln)
+    rec1=(leftEye[4][0]+ln,leftEye[4][1]+ln)
+     
+    rec2=(rightEye[1][0]-rn,rightEye[1][1]-rn)
+    rec3=(rightEye[4][0]+rn,rightEye[4][1]+rn)
     
+    print("Area for left eye",rec0,rec1)
+    print("Area for right eye",rec2,rec3)
+
+    """ Area Assignment for left eye and right eye"""
+    areaLeft=(rec0[0],rec0[1],rec1[0],rec1[1])
+    areaRight=(rec2[0],rec2[1],rec3[0],rec3[1])
+    
+    """ Resizing the flare image to fit the area"""
+    flareLeft=flare.resize((rec1[0]-rec0[0],rec1[1]-rec0[1]))
+    flareRight=flare.resize((rec3[0]-rec2[0],rec3[1]-rec2[1]))
+    
+    """Pasting the flare image on the area.
+       Third parameter is an alpha channel that provides transparency for the png"""
+    img.paste(flareLeft,areaLeft,flareLeft)
+    img.paste(flareRight,areaRight,flareRight)
+    return img
+
+
+def main():
+    img = Image.open('test.jpg')
+    #img = Image.opne('test2.jpg')
     img = img.convert('RGB')
     img = crushAndBack(img)
     img = generateHue(img)
-    rec0=(leftEye[1][0]-100,leftEye[1][1]-100)
-    rec1=(leftEye[4][0]+100,leftEye[4][1]+100)
-    rec2=(rightEye[1][0]-100,rightEye[1][1]-100)
-    rec3=(rightEye[4][0]+100,rightEye[4][1]+100)
-    print("Area for left eye",rec0,rec1)
-    print("Area for right eye",rec2,rec3)
-    area=(rec0[0],rec0[1],rec1[0],rec1[1])
-    area1=(rec2[0],rec2[1],rec3[0],rec3[1])
-    flare1=flare.resize((rec1[0]-rec0[0],rec1[1]-rec0[1]))
-    flare2=flare.resize((rec3[0]-rec2[0],rec3[1]-rec2[1]))
-    img.paste(flare1,area,flare1)
-    img.paste(flare2,area1,flare2)
-      
-    
-    #img.paste(flare,eyeLeft,flare)
-
+    img = addFlare(img)
+       
     img.show()
+    #img.save('output2.jpg')
     img.save('output.jpg')
 
-    #img.save('sample.jpg','jpeg')
+   
 
 if __name__ == '__main__':
     main()
