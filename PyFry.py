@@ -4,12 +4,23 @@ import os
 from utils.utils import Colors
 from imutils import face_utils
 import dlib
+import tkinter as tk
+from tkinter import filedialog
 '''
 TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
-      -> Applying Red and Orange hue filters for classic deep fry look
+      -> Applying Red and Orange hue filters for classic deep fry look :: DONE
       -> Detecting eye coordinates and applying the deepfry eye flare in the center::DONE
 
 '''
+def userInput():
+    #Allowing user to choose the image that has to be deepfried
+    root =tk.Tk()
+    root.withdraw()
+    global filepath
+    filepath = filedialog.askopenfilename(title="PyFry - Choose Image")
+    print("picture location = ",filepath)
+
+    
 def irisCoords(eye):
     #Finding the center point of the eye using the average outer extremes average of the eyes
     mid = (eye[0] +eye[3])/2
@@ -90,7 +101,9 @@ def addFlare(img):
 
 
 def main():
-    img = Image.open('test.jpg')
+    userInput()
+    
+    img = Image.open(filepath)
     #img = Image.opne('test2.jpg')
     img = img.convert('RGB')
     img = crushAndBack(img)
@@ -100,7 +113,7 @@ def main():
     img.show()
     #img.save('output2.jpg')
     img.save('output.jpg')
-
+    print("output saved as output.jpg")
    
 
 if __name__ == '__main__':
