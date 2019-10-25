@@ -14,10 +14,10 @@ TODO: -> Compressing (Crushing) and back (to increase noise) :: DONE
 '''
 def userInput():
     #Allowing user to choose the image that has to be deepfried
-    root =tk.Tk()
+    root = tk.Tk()
     root.withdraw()
     global filepath
-    filepath = filedialog.askopenfilename(title="PyFry - Choose Image")
+    filepath = list(root.tk.splitlist(filedialog.askopenfilenames(title="PyFry - Choose Image")))
     print("picture location = ",filepath)
 
     
@@ -105,17 +105,19 @@ def addFlare(img):
 def main():
     userInput()
     
-    img = Image.open(filepath)
-    #img = Image.opne('test2.jpg')
-    img = img.convert('RGB')
-    img = crushAndBack(img)
-    img = generateHue(img)
-    img = addFlare(img)
-       
-    img.show()
-    #img.save('output2.jpg')
-    img.save('output.jpg')
-    print("output saved as output.jpg")
+    for img_path in filepath:
+        img = Image.open(img_path)
+        #img = Image.opne('test2.jpg')
+        img = img.convert('RGB')
+        img = crushAndBack(img)
+        img = generateHue(img)
+        img = addFlare(img)
+        
+        img.show()
+        #img.save('output2.jpg')
+        filename = os.path.splitext(os.path.basename(img_path))[0]
+        img.save('%s_output.jpg' % filename)
+        print("output saved as %s_output.jpg" % filename)
    
 
 if __name__ == '__main__':
